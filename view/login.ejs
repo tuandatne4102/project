@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập | Luyện thi CNTT</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h2>Đăng nhập hệ thống luyện thi</h2>
+      <form id="login-form" action="/login" method="POST">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" id="username" name="username" required />
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" name="password" required />
+        <button type="submit">Đăng nhập</button>
+
+        <% if (typeof error !== 'undefined') { %>
+          <p id="error-msg" class="error"><%= error %></p>
+        <% } %>
+      </form>
+    </div>
+  </body>
+</html>
+
+<%- include('partials/footer') %>
