@@ -6,62 +6,180 @@
 }
 
 body {
-  background-color: #f0f4f8;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
   color: #333;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* ===== Container ===== */
 .container {
   max-width: 1200px;
   margin: auto;
   padding: 0 1rem;
 }
 
-.login-container {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  width: 320px;
-  margin: 80px auto;
+/* ===== Header ===== */
+header {
+  background-color: #212529;
 }
 
-.login-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.3rem;
 }
 
-.input-group {
-  margin-bottom: 15px;
+.logo-img {
+  height: 40px;
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
+.navbar-nav .nav-link {
   color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
+  font-weight: 500;
 }
 
-button:hover {
+.navbar-nav .nav-link:hover {
+  color: #ffc107;
+}
+
+.btn-warning {
+  font-weight: bold;
+}
+
+/* ===== Dashboard ===== */
+.dashboard h1 {
+  font-weight: bold;
+  color: #212529;
+}
+
+.dashboard p.lead {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.menu-buttons .btn {
+  padding: 1rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.menu-buttons .btn:hover {
+  transform: scale(1.05);
+}
+
+/* ===== Footer ===== */
+.footer {
+  background-color: #212529;
+  color: #fff;
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+.footer .social-icons a {
+  font-size: 1.2rem;
+  transition: color 0.3s;
+}
+
+.footer .social-icons a:hover {
+  color: #ffc107;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .dashboard h1 {
+    font-size: 2rem;
+  }
+
+  .dashboard p.lead {
+    font-size: 1rem;
+  }
+
+  .menu-buttons .btn {
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+}
+
+.login-box .small {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.login-box a {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-box a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Quiz Page ===== */
+.quiz-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.quiz-box {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-box h2 {
+  font-weight: bold;
+  color: #212529;
+}
+
+.question-text {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+#question-content {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-check-label {
+  font-weight: 500;
+}
+
+#progress {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* ===== Settings Page ===== */
+
+.settings-box {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.settings-box h2 {
+  font-weight: bold;
+  color: #212529;
+}
+
+.settings-box .form-label {
+  font-weight: 500;
+}
+
+.settings-box .form-select,
+.settings-box .form-control {
+  border-radius: 6px;
+}
+
+.settings-box .btn {
+  font-weight: bold;
+  padding: 0.6rem;
+}
