@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+<body>
+    <div class="login-container">
+        <h2>Đăng ký tài khoản mới</h2>
+        <form action="/register" method="POST">
+            <div class="input-group">
+                <label for="username">Tên đăng nhập</label>
+                <input type="text" id="username" name="username" required />
+            </div>
+            <div class="input-group">
+                <label for="password">Mật khẩu</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" name="email" required />
+            </div>
+
+            <button type="submit">Đăng ký</button>
+            <% if (typeof error !== "undefined") { %>
+                <p class="error"><%= error %></p>
+            <% } %>
+        </form>
+    </div>
+  </body>
+
+
+<%- include('partials/footer') %>
