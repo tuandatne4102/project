@@ -1,0 +1,25 @@
+{
+  "name": "catalog-web",
+  "version": "1.0.0",
+  "description": "e-catalog",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "react"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "events": "^3.3.0",
+    "express": "^4.21.1",
+    "msnodesqlv8": "^4.4.0",
+    "mssql": "^11.0.1",
+    "tedious": "^18.6.1"
+  }
+}
