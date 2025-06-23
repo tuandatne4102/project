@@ -3,70 +3,165 @@ const sql = require('mssql');
 const connectToDatabase = require('./db');
 const app = express();
 const path = require('path');
+const User = require("./public/Models/User")
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
 
 // Set the view engine to EJS and the views directory 
-app.set('view engine', 'ejs'); app.set('views', path.join(__dirname, 'view')); 
+app.set('view engine', 'ejs'); app.set('views', path.join(__dirname, 'view'));
 
 // Serve static files from the 'public' directory 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Route trang chu
+app.use(session({
+  secret: "your-secret-key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // dùng false nếu đang chạy localhost
+}));
+
+const startApp = async () => {
+  try {
+    await connectToDatabase();
+
+    console.log("✅ Kết nối MongoDB thành công");
+
+    app.listen(3000, () => {
+      console.log("🚀 Server đang chạy tại http://localhost:3000");
+    });
+
+  } catch (err) {
+    console.error("❌ Kết nối MongoDB thất bại:", err);
+  }
+};
+
+startApp();
+
+
+// Route dang ky
+app.get('/register', (req, res) => {
+  try {
+    res.render('register.ejs');
+  } catch (err) {
+    console.error("An error occurred", err);
+    res.status(500).send("An error occurred while fetching data");
+  }
+});
+
+app.post("/register", async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    const existing = await User.findOne({ username });
+    if (existing) {
+      return res.render("register", { error: "Tên đăng nhập đã tồn tại" });
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username,
+      email,
+      password: hashed
+    });
+
+    await newUser.save();
+    res.redirect("/login");
+  } catch (err) {
+    console.log("Error register", err);
+    res.render("register", { error: "An error occurred" });
+  }
+});
+
+// Route dang nhap
+app.get('/login', async (req, res) => {
+  try {
+    res.render('login.ejs');
+  } catch (err) {
+    console.error("An error occurred", err);
+    res.status(500).send("An error occurred while fetching data");
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    return res.render("login", { error: "Tài khoản không tồn tại." });
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.render("login", { error: "Mật khẩu không đúng." });
+  }
+
+  req.session.userId = user._id;
+  res.redirect("/");
+});
+
+// Route dashboard
 app.get('/', async (req, res) => {
-    try {
-        await connectToDatabase();
-
-        const request = new sql.Request();
-        const result = await request.query("SELECT * FROM models");
-
-        // console.log(result.recordset);
-
-        // Render the data to the EJS template
-        res.render('index.ejs', { data: result.recordset });
-    } catch (err) {
-        console.error("An error occurred", err);
-        res.status(500).send("An error occurred while fetching data");
-    }
+  try {
+    res.render('dashboard.ejs');
+  } catch (err) {
+    console.error("An error occurred", err);
+    res.status(500).send("An error occurred while fetching data");
+  }
 });
 
-// Route Du An Tieu Bieu
-app.get('/duan', async (req, res) => {
-    try {
-        await connectToDatabase();
-
-        const request = new sql.Request();
-        const result = await request.query("SELECT * FROM models");
-
-        // console.log(result.recordset);
-
-        // Render the data to the EJS template
-        res.render('duan.ejs', { data: result.recordset });
-    } catch (err) {
-        console.error("An error occurred", err);
-        res.status(500).send("An error occurred while fetching data");
-    }
+app.get('/quiz', async (req, res) => {
+  try {
+    res.render('quiz.ejs');
+  } catch (err) {
+    console.error("An error occurred", err);
+    res.status(500).send("An error occurred while fetching data");
+  }
 });
 
-// Route Chi Tiet Nha
-app.get('/house', async (req, res) => {
-    const houseId = req.query.id; // Get the id from query parameters
+// app.get('/settings', async (req, res) => {
+//   try {
+//     res.render('settings.ejs');
+//   } catch (err) {
+//     console.error("An error occurred", err);
+//     res.status(500).send("An error occurred while fetching data");
+//   }
+// });
 
-    try {
-        await connectToDatabase();
+//Route setting
 
-        const request = new sql.Request();
-        const result = await request.query(`SELECT * FROM models WHERE id = '${houseId}'`);
+app.get('/settings', async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) return res.redirect("/login");
 
-        // console.log(result.recordset);
-
-        // Render the data to the EJS template
-        res.render('house', { data: result.recordset });
-    } catch (err) {
-        console.error("An error occurred", err);
-        res.status(500).send("An error occurred while fetching data");
-    }
+    res.render('settings.ejs', { user });
+  } catch (err) {
+    console.error("❌ Lỗi khi tải settings:", err);
+    res.status(500).send("Lỗi khi tải cài đặt");
+  }
 });
 
+app.post('/settings', async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+    console.log(req.body.avatar);
+    if (!user) return res.redirect("/login");
 
-app.listen(3000, () => {
-    console.log("The server has started on port 3000");
+    user.setting.music = !!req.body.music;
+    user.setting.sound_effects = !!req.body.sound_effects;
+    user.setting.timer_per_question = !!req.body.timer_per_question;
+    user.setting.timer_whole_test = !!req.body.timer_whole_test;
+    user.avatar = req.body.avatar;
+
+    await user.save();
+    res.redirect("/settings");
+  } catch (err) {
+    console.error("❌ Lỗi khi cập nhật settings:", err);
+    res.status(500).send("Lỗi khi lưu cài đặt");
+  }
 });

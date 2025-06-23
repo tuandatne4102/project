@@ -1,0 +1,104 @@
+<%- include('partials/header') %>
+
+    <!--  <main class="settings-page container py-5">
+        <div class="settings-box mx-auto p-4 shadow rounded bg-white" style="max-width: 600px;">
+            <h2 class="text-center mb-4">⚙️ Cài đặt cá nhân</h2>
+            <form action="/settings" method="POST">
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="music" name="music">
+                    <label class="form-check-label" for="music">Nhạc nền (mặc định: tắt)</label>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="sound" name="sound">
+                    <label class="form-check-label" for="sound">Âm thanh hiệu ứng đúng/sai (mặc định: tắt)</label>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="timer" name="timer" checked>
+                    <label class="form-check-label" for="timer">Hẹn giờ cho mỗi câu hỏi (mặc định: bật)</label>
+                </div>
+
+                <div class="mb-3">
+                    <label for="attempts" class="form-label">Số lần làm lại mỗi câu hỏi (mặc định: 5)</label>
+                    <input type="number" class="form-control" id="attempts" name="attempts" min="1" max="10" value="5">
+                </div>
+
+                <div class="mb-3">
+                    <label for="bonusTime" class="form-label">Thời gian bonus tối đa (giây)</label>
+                    <input type="number" class="form-control" id="bonusTime" name="bonusTime" min="0" max="60"
+                        value="10">
+                </div>
+
+                <div class="mb-4">
+                    <label for="avatar" class="form-label">Chọn avatar</label>
+                    <select class="form-select" id="avatar" name="avatar">
+                        <option value="robot">🤖 Robot</option>
+                        <option value="student">🎓 Sinh viên</option>
+                        <option value="coder">💻 Lập trình viên</option>
+                        <option value="owl">🦉 Cú thông thái</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Lưu cài đặt</button>
+            </form>
+        </div>
+    </main> -->
+
+    <main class="settings-page container py-5">
+        <div class="settings-box mx-auto p-4 shadow rounded bg-white" style="max-width: 600px;">
+            <h2 class="text-center mb-4">⚙️ Cài đặt cá nhân</h2>
+            <form action="/settings" method="POST">
+                <!-- Nhạc nền -->
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="music" name="music" <%=user.setting.music
+                        ? 'checked' : '' %>>
+                    <label class="form-check-label" for="music">Nhạc nền (mặc định: tắt)</label>
+                </div>
+
+                <!-- Âm thanh hiệu ứng -->
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="sound_effects" name="sound_effects"
+                        <%=user.setting.sound_effects ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sound_effects">Âm thanh hiệu ứng đúng/sai (mặc định:
+                        tắt)</label>
+                </div>
+
+                <!-- Hẹn giờ mỗi câu hỏi -->
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="timer_per_question" name="timer_per_question"
+                        <%=user.setting.timer_per_question ? 'checked' : '' %>>
+                    <label class="form-check-label" for="timer_per_question">Hẹn giờ cho mỗi câu hỏi (mặc định:
+                        bật)</label>
+                </div>
+
+                <!-- Hẹn giờ toàn bài -->
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="timer_whole_test" name="timer_whole_test"
+                        <%=user.setting.timer_whole_test ? 'checked' : '' %>>
+                    <label class="form-check-label" for="timer_whole_test">Hẹn giờ toàn bài kiểm tra</label>
+                </div>
+
+                <!-- Avatar -->
+                <div class="mb-4">
+                    <label for="avatar" class="form-label">Chọn avatar</label>
+                    <select class="form-select" id="avatar" name="avatar" value="<%=user.avatar%>">
+                        <option value="robot.png" <%=user.avatar==='robot' ? 'selected' : '' %>>🤖 Robot</option>
+                        <option value="sinhvien.png" <%=user.avatar==='sinhvien' ? 'selected' : '' %>>🎓 Sinh viên
+                        </option>
+                        <option value="laptrinhvien.png" <%=user.avatar==='laptrinhvien' ? 'selected' : '' %>>💻 Lập
+                            trình
+                            viên
+                        </option>
+                        <option value="cuthongthai.png" <%=user.avatar==='cuthongthai' ? 'selected' : '' %>>🦉 Cú thông
+                            thái
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">💾 Lưu cài đặt</button>
+            </form>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>

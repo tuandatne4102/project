@@ -47,28 +47,26 @@ header {
   font-weight: bold;
 }
 
-/* ===== Hero Section ===== */
-#hero {
-  background: url('/images/hero.jpg') no-repeat center center/cover;
-  color: #fff;
-  text-align: center;
-  padding: 5rem 1rem;
+/* ===== Dashboard ===== */
+.dashboard h1 {
+  font-weight: bold;
+  color: #212529;
 }
 
-#hero h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-#hero p {
+.dashboard p.lead {
   font-size: 1.2rem;
-  margin-bottom: 2rem;
+  color: #555;
 }
 
-#hero .btn {
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  border-radius: 5px;
+.menu-buttons .btn {
+  padding: 1rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.menu-buttons .btn:hover {
+  transform: scale(1.05);
 }
 
 /* ===== Footer ===== */
@@ -77,6 +75,7 @@ header {
   color: #fff;
   text-align: center;
   font-size: 0.9rem;
+  padding: 1rem 0;
 }
 
 .footer .social-icons a {
@@ -90,11 +89,97 @@ header {
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  #hero h1 {
+  .dashboard h1 {
     font-size: 2rem;
   }
 
-  #hero p {
+  .dashboard p.lead {
     font-size: 1rem;
   }
+
+  .menu-buttons .btn {
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+}
+
+.login-box .small {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.login-box a {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-box a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Quiz Page ===== */
+.quiz-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.quiz-box {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-box h2 {
+  font-weight: bold;
+  color: #212529;
+}
+
+.question-text {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+#question-content {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-check-label {
+  font-weight: 500;
+}
+
+#progress {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* ===== Settings Page ===== */
+
+.settings-box {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.settings-box h2 {
+  font-weight: bold;
+  color: #212529;
+}
+
+.settings-box .form-label {
+  font-weight: 500;
+}
+
+.settings-box .form-select,
+.settings-box .form-control {
+  border-radius: 6px;
+}
+
+.settings-box .btn {
+  font-weight: bold;
+  padding: 0.6rem;
 }
