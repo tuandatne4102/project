@@ -44,6 +44,7 @@
         <h3 class="text-center text-success">🎉 Bạn đã hoàn thành bài kiểm tra!</h3>
         <p class="text-center">⏱️ Thời gian làm bài: <span id="duration"></span></p>
         <p class="text-center fw-bold">Điểm của bạn: <span id="score"></span> / <span id="total"></span></p>
+        <div id="result-detail" class="mt-4"></div>
       </div>
     </div>
   </main>
@@ -70,7 +71,8 @@
           `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       }, 1000);
     }
-    const questions = <% - JSON.stringify(questions) %>;
+
+    const questions = <%- JSON.stringify(questions) %>;
     let currentIndex = 0;
     const userAnswers = Array(questions.length).fill(null);
 
@@ -123,26 +125,10 @@
       }
     }
 
-    function showResult() {
-      let score = 0;
-      questions.forEach((q, i) => {
-        if (userAnswers[i] === q.correct) score++;
-      });
-
-      document.getElementById("question-area").style.display = "none";
-      document.getElementById("result-area").style.display = "block";
-      document.getElementById("score").textContent = score;
-      document.getElementById("total").textContent = questions.length;
-    }
-
-    window.onload = () => {
-      renderQuestion(currentIndex)
-      startTimer()
-    };
-
     async function showResult() {
       clearInterval(timerInterval); // Dừng timer
 
+      // Tính điểm
       let score = 0;
       questions.forEach((q, i) => {
         if (userAnswers[i] === q.correct) score++;
@@ -155,6 +141,32 @@
       document.getElementById("result-area").style.display = "block";
       document.getElementById("score").textContent = score;
       document.getElementById("total").textContent = questions.length;
+
+      const resultDetail = document.getElementById("result-detail");
+      resultDetail.innerHTML = ""; // Xoá cũ
+
+      // Xem lại đáp án
+      questions.forEach((q, i) => {
+        const userAnswer = userAnswers[i];
+        const isCorrect = userAnswer === q.correct;
+        const correctText = q[q.correct];
+        const selectedText = q[userAnswer] || "Không chọn";
+
+        const questionHtml = `
+          <div class="mb-3 p-3 border rounded ${isCorrect ? 'border-success bg-light' : 'border-danger bg-light'}">
+            <p><strong>Câu ${i + 1}:</strong> ${q.question}</p>
+            ${
+              isCorrect
+              ? `<p class="text-success">✅ Đúng! Đáp án: <strong>${correctText}</strong></p>`
+              : `<p class="text-danger">❌ Sai! Bạn chọn: <strong>${selectedText}</strong></p>
+                <p class="text-success">✅ Đáp án đúng: <strong>${correctText}</strong></p>`
+            }
+          </div>
+        `;
+
+        resultDetail.innerHTML += questionHtml;
+      });
+
 
       // Hiển thị thời gian làm bài
       const minutes = Math.floor(duration / 60);
@@ -179,6 +191,13 @@
     }
 
     const startTime = Date.now();
+
+    window.onload = () => {
+      console.log("🚀 Trang đã load, bắt đầu quiz!");
+      console.log(questions);
+      renderQuestion(currentIndex);
+      startTimer();
+    };
 
   </script>
 

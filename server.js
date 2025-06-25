@@ -151,14 +151,11 @@ app.post("/start-quiz", (req, res) => {
 app.get('/quiz', async (req, res) => {
   const topic = req.query.topic;
   let filePath;
-
   filePath = path.join(__dirname, "./public/subjects", topic + ".xlsx");
-  console.log(filePath);
   try {
     const workbook = xlsx.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const questions = xlsx.utils.sheet_to_json(sheet);
-
     res.render('quiz.ejs', { questions });
   } catch (err) {
     console.error("An error occurred", err);
@@ -189,6 +186,21 @@ app.post("/submit-result", async (req, res) => {
     res.status(500).send("Lỗi máy chủ");
   }
 });
+
+app.get("/results", async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect("/login");
+  }
+
+  try {
+    const results = await Result.find({ user_id: req.session.userId }).sort({ submitted_at: -1 });
+    res.render("results", { results });
+  } catch (err) {
+    console.error("Lỗi khi lấy kết quả:", err);
+    res.status(500).send("Lỗi máy chủ");
+  }
+});
+
 
 //Route setting
 
