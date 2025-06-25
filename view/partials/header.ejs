@@ -10,22 +10,42 @@
 </head>
 
 <body>
-  <!-- Navigation Bar -->
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="/">
-          <span>Luyện thi CNTT</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="/questions">Ngân hàng câu hỏi</a></li>
-            <li class="nav-item"><a class="btn btn-warning ms-2" href="/login">Đăng nhập ngay</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
+
+  <% if (user && user.setting && user.setting.music) { %>
+    <audio id="background-music" autoplay loop>
+      <source src="/audio/Can-can-song.mp3" type="audio/mpeg">Trình duyệt của bạn không hỗ trợ phát nhạc.
+    </audio>
+    <% } %>
+
+      <!-- Navigation Bar -->
+      <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+              <span>Luyện thi CNTT</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/questions">Ngân hàng câu hỏi</a></li>
+                <% if (user) { %>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/settings">
+                      <%= user.username %>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="btn btn-outline-light ms-2" href="/logout">Đăng xuất</a>
+                  </li>
+                  <% } else { %>
+                    <li class="nav-item">
+                      <a class="btn btn-warning ms-2" href="/login">Đăng nhập ngay</a>
+                    </li>
+                    <% } %>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>

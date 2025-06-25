@@ -25,6 +25,20 @@ app.use(session({
   cookie: { secure: false } // dùng false nếu đang chạy localhost
 }));
 
+app.use(async (req, res, next) => {
+  if (req.session.userId) {
+    try {
+      const user = await User.findById(req.session.userId);
+      res.locals.user = user;
+    } catch (err) {
+      res.locals.user = null;
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
+
 const startApp = async () => {
   try {
     await connectToDatabase();
@@ -106,6 +120,19 @@ app.post("/login", async (req, res) => {
   res.redirect("/");
 });
 
+
+// Route dang xuat
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error("Lỗi khi đăng xuất:", err);
+      return res.status(500).send("Lỗi khi đăng xuất");
+    }
+    res.redirect('/');
+  });
+});
+
+
 // Route dashboard
 app.get('/', async (req, res) => {
   try {
@@ -162,15 +189,6 @@ app.post("/submit-result", async (req, res) => {
     res.status(500).send("Lỗi máy chủ");
   }
 });
-
-// app.get('/settings', async (req, res) => {
-//   try {
-//     res.render('settings.ejs');
-//   } catch (err) {
-//     console.error("An error occurred", err);
-//     res.status(500).send("An error occurred while fetching data");
-//   }
-// });
 
 //Route setting
 
