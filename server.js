@@ -3,11 +3,13 @@ const sql = require('mssql');
 const connectToDatabase = require('./db');
 const app = express();
 const path = require('path');
-const User = require("./public/Models/User")
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const xlsx = require("xlsx");
 
+const User = require("./public/Models/User")
+const Result = require("./public/Models/Result");
 // Set the view engine to EJS and the views directory 
 app.set('view engine', 'ejs'); app.set('views', path.join(__dirname, 'view'));
 
@@ -114,12 +116,50 @@ app.get('/', async (req, res) => {
   }
 });
 
+app.post("/start-quiz", (req, res) => {
+  const topic = req.body.topic; // lấy "networking" hoặc "database"
+  res.redirect(`/quiz?topic=${topic}`);
+});
+
 app.get('/quiz', async (req, res) => {
+  const topic = req.query.topic;
+  let filePath;
+
+  filePath = path.join(__dirname, "./public/subjects", topic + ".xlsx");
+  console.log(filePath);
   try {
-    res.render('quiz.ejs');
+    const workbook = xlsx.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const questions = xlsx.utils.sheet_to_json(sheet);
+
+    res.render('quiz.ejs', { questions });
   } catch (err) {
     console.error("An error occurred", err);
     res.status(500).send("An error occurred while fetching data");
+  }
+});
+
+app.post("/submit-result", async (req, res) => {
+  try {
+    const { subject, correct, total, duration_seconds } = req.body;
+    const userId = req.session.userId;
+
+    if (!userId) return res.status(401).send("Bạn chưa đăng nhập");
+
+    const result = new Result({
+      user_id: userId,
+      subject,
+      correct,
+      total,
+      duration_seconds,
+      submitted_at: new Date()
+    });
+
+    await result.save();
+    res.status(200).send("Lưu kết quả thành công");
+  } catch (err) {
+    console.error("Lỗi khi lưu kết quả:", err);
+    res.status(500).send("Lỗi máy chủ");
   }
 });
 

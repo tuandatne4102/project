@@ -1,42 +1,185 @@
 <%- include('partials/header') %>
 
-  <main class="quiz-page container py-5">
-    <div class="quiz-box mx-auto p-4 shadow rounded bg-white" style="max-width: 700px;">
-      <h2 class="text-center mb-4">🧠 Bài kiểm tra trắc nghiệm CNTT</h2>
+<main class="quiz-page container py-5">
+  <div class="quiz-box mx-auto p-4 shadow rounded bg-white" style="max-width: 700px;">
+    <h2 class="text-center mb-4">🧠 Bài kiểm tra trắc nghiệm CNTT</h2>
 
-      <div id="question-area">
-        <p class="question-text fw-bold">Câu hỏi <span id="question-number">1</span>:</p>
-        <p id="question-content">HTML là viết tắt của gì?</p>
+    <div id="question-area">
+      <div class="text-end text-muted mb-2">
+        ⏱️ Thời gian: <span id="timer">10:00</span>
+      </div>
+      <p class="question-text fw-bold">Câu hỏi <span id="question-number">1</span>:</p>
+      <p id="question-content">Đang tải...</p>
 
-        <form id="quiz-form">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="answer" id="optionA" value="A">
-            <label class="form-check-label" for="optionA">A. Hypertext Markup Language</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="answer" id="optionB" value="B">
-            <label class="form-check-label" for="optionB">B. Hyperlink Transfer Language</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="answer" id="optionC" value="C">
-            <label class="form-check-label" for="optionC">C. Home Tool Language</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="answer" id="optionD" value="D">
-            <label class="form-check-label" for="optionD">D. Hyper Transfer Machine</label>
-          </div>
-
-          <div class="mt-4 d-flex justify-content-between">
-            <button type="button" class="btn btn-secondary" id="prev-btn">⬅️ Trước</button>
-            <button type="button" class="btn btn-secondary" id="next-btn">➡️ Tiếp</button>
-          </div>
-        </form>
-
-        <div class="mt-3 text-end">
-          <span id="progress">Câu 1 / 10</span>
+      <form id="quiz-form">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="answer" id="optionA" value="option_1">
+          <label class="form-check-label" for="optionA" id="labelA">A</label>
         </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="answer" id="optionB" value="option_2">
+          <label class="form-check-label" for="optionB" id="labelB">B</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="answer" id="optionC" value="option_3">
+          <label class="form-check-label" for="optionC" id="labelC">C</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="answer" id="optionD" value="option_4">
+          <label class="form-check-label" for="optionD" id="labelD">D</label>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" id="prev-btn">⬅️ Trước</button>
+          <button type="button" class="btn btn-secondary" id="next-btn">➡️ Tiếp</button>
+        </div>
+      </form>
+
+      <div class="mt-3 text-end">
+        <span id="progress">Câu 1 / N</span>
       </div>
     </div>
-  </main>
 
-  <%- include('partials/footer') %>
+    <div id="result-area" style="display:none;">
+      <h3 class="text-center text-success">🎉 Bạn đã hoàn thành bài kiểm tra!</h3>
+      <p class="text-center">⏱️ Thời gian làm bài: <span id="duration"></span></p>
+      <p class="text-center fw-bold">Điểm của bạn: <span id="score"></span> / <span id="total"></span></p>
+    </div>
+  </div>
+</main>
+
+<script>
+  const TIME_LIMIT = 600; // 10 phút = 600 giây
+  let timerInterval;
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = Math.floor((now - startTime) / 1000);
+      const remaining = TIME_LIMIT - elapsed;
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        alert("⏱️ Hết thời gian! Bài kiểm tra sẽ được nộp.");
+        showResult(); // Auto-submit
+        return;
+      }
+
+      const minutes = Math.floor(remaining / 60);
+      const seconds = remaining % 60;
+      document.getElementById("timer").textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+  }
+  const questions = <%- JSON.stringify(questions) %>;
+  let currentIndex = 0;
+  const userAnswers = Array(questions.length).fill(null);
+
+  function renderQuestion(index) {
+    const q = questions[index];
+    document.getElementById("question-number").textContent = index + 1;
+    document.getElementById("question-content").textContent = q.question;
+
+    // Gán option và ẩn nếu thiếu
+    ["option_1", "option_2", "option_3", "option_4"].forEach((key, i) => {
+      const input = document.getElementById("option" + String.fromCharCode(65 + i));
+      const label = document.getElementById("label" + String.fromCharCode(65 + i));
+      if (q[key]) {
+        input.style.display = "inline-block";
+        label.style.display = "inline-block";
+        label.textContent = String.fromCharCode(65 + i) + ". " + q[key];
+        input.value = key;
+      } else {
+        input.style.display = "none";
+        label.style.display = "none";
+      }
+      input.checked = userAnswers[index] === key;
+    });
+
+    document.getElementById("progress").textContent = `Câu ${index + 1} / ${questions.length}`;
+  }
+
+  document.getElementById("next-btn").addEventListener("click", () => {
+    saveAnswer();
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
+      renderQuestion(currentIndex);
+    } else {
+      showResult();
+    }
+  });
+
+  document.getElementById("prev-btn").addEventListener("click", () => {
+    saveAnswer();
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  });
+
+  function saveAnswer() {
+    const checked = document.querySelector('input[name="answer"]:checked');
+    if (checked) {
+      userAnswers[currentIndex] = checked.value;
+    }
+  }
+
+  function showResult() {
+    let score = 0;
+    questions.forEach((q, i) => {
+      if (userAnswers[i] === q.correct) score++;
+    });
+
+    document.getElementById("question-area").style.display = "none";
+    document.getElementById("result-area").style.display = "block";
+    document.getElementById("score").textContent = score;
+    document.getElementById("total").textContent = questions.length;
+  }
+
+  window.onload = () => {
+    renderQuestion(currentIndex)
+    startTimer()
+  };
+
+  async function showResult() {
+  clearInterval(timerInterval); // Dừng timer
+
+  let score = 0;
+  questions.forEach((q, i) => {
+    if (userAnswers[i] === q.correct) score++;
+  });
+
+  const subject = new URLSearchParams(window.location.search).get("topic");
+  const duration = Math.floor((Date.now() - startTime) / 1000);
+
+  document.getElementById("question-area").style.display = "none";
+  document.getElementById("result-area").style.display = "block";
+  document.getElementById("score").textContent = score;
+  document.getElementById("total").textContent = questions.length;
+
+  // Hiển thị thời gian làm bài
+  const minutes = Math.floor(duration / 60);
+  const seconds = duration % 60;
+  document.getElementById("duration").textContent = 
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+  try {
+    await fetch("/submit-result", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subject: subject,
+        correct: score,
+        total: questions.length,
+        duration_seconds: duration
+      })
+    });
+  } catch (err) {
+    console.error("Lỗi khi gửi kết quả:", err);
+  }
+}
+
+const startTime = Date.now();
+
+</script>
+
+<%- include('partials/footer') %>

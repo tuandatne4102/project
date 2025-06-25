@@ -4,10 +4,16 @@
     <h1 class="mb-4">🎯 Hệ thống luyện thi CNTT</h1>
     <p class="lead mb-5">Ôn luyện kiến thức chuyên ngành Công nghệ thông tin qua các bài trắc nghiệm trực tuyến.</p>
 
-    <div class="menu-buttons d-grid gap-4 col-md-6 mx-auto">
-      <a href="/quiz" class="btn btn-primary btn-lg">📝 Bắt đầu làm bài</a>
-      <a href="/settings" class="btn btn-secondary btn-lg">⚙️ Cài đặt</a>
-    </div>
+    <h2 class="text-center mb-4">🧪 Chọn đề thi</h2>
+
+    <form action="/start-quiz" method="POST" class="text-center">
+      <select name="topic" class="form-select mb-3" style="max-width: 400px; margin: 0 auto;">
+        <option value="networking">Đề Mạng máy tính</option>
+        <option value="database">Đề Cơ sở dữ liệu</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Bắt đầu làm bài</button>
+    </form>
+
   </main>
 
   <%- include('partials/footer') %>
