@@ -150,16 +150,20 @@ app.post("/start-quiz", (req, res) => {
 
 app.get('/quiz', async (req, res) => {
   const topic = req.query.topic;
-  let filePath;
-  filePath = path.join(__dirname, "./public/subjects", topic + ".xlsx");
+  const filePath = path.join(__dirname, "./public/subjects", topic + ".xlsx");
+
   try {
     const workbook = xlsx.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const questions = xlsx.utils.sheet_to_json(sheet);
-    res.render('quiz.ejs', { questions });
+
+    res.render('quiz.ejs', {
+      questions,
+      user: res.locals.user
+    });
   } catch (err) {
-    console.error("An error occurred", err);
-    res.status(500).send("An error occurred while fetching data");
+    console.error("Lỗi khi tải đề:", err);
+    res.status(500).send("Lỗi khi tải đề");
   }
 });
 

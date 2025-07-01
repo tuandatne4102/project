@@ -178,3 +178,11 @@ form button.btn-primary {
     padding: 0.5rem 0;
   }
 }
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
