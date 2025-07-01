@@ -49,156 +49,174 @@
     </div>
   </main>
 
-  <script>
-    const TIME_LIMIT = 600; // 10 phút = 600 giây
-    let timerInterval;
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        const now = Date.now();
-        const elapsed = Math.floor((now - startTime) / 1000);
-        const remaining = TIME_LIMIT - elapsed;
+<!-- Âm thanh đúng/sai -->
+<audio id="sound-correct" src="/audio/correct.mp3" preload="auto"></audio>
+<audio id="sound-wrong" src="/audio/wrong.mp3" preload="auto"></audio>
 
-        if (remaining <= 0) {
-          clearInterval(timerInterval);
-          alert("⏱️ Hết thời gian! Bài kiểm tra sẽ được nộp.");
-          showResult(); // Auto-submit
-          return;
-        }
+<script>
+  const TIME_LIMIT = 600; // 10 phút
+  let timerInterval;
+  const startTime = Date.now();
 
-        const minutes = Math.floor(remaining / 60);
-        const seconds = remaining % 60;
-        document.getElementById("timer").textContent =
-          `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }, 1000);
-    }
+  const correctSound = document.getElementById("sound-correct");
+  const wrongSound = document.getElementById("sound-wrong");
 
-    const questions = <%- JSON.stringify(questions) %>;
-    let currentIndex = 0;
-    const userAnswers = Array(questions.length).fill(null);
+  const questions = <%- JSON.stringify(questions) %>;
+  const soundEffectsEnabled = <%= user && user.setting && user.setting.sound_effects ? 'true' : 'false' %>;
 
-    function renderQuestion(index) {
-      const q = questions[index];
-      document.getElementById("question-number").textContent = index + 1;
-      document.getElementById("question-content").textContent = q.question;
+  let currentIndex = 0;
+  const userAnswers = Array(questions.length).fill(null);
 
-      // Gán option và ẩn nếu thiếu
-      ["option_1", "option_2", "option_3", "option_4"].forEach((key, i) => {
-        const input = document.getElementById("option" + String.fromCharCode(65 + i));
-        const label = document.getElementById("label" + String.fromCharCode(65 + i));
-        if (q[key]) {
-          input.style.display = "inline-block";
-          label.style.display = "inline-block";
-          label.textContent = String.fromCharCode(65 + i) + ". " + q[key];
-          input.value = key;
-        } else {
-          input.style.display = "none";
-          label.style.display = "none";
-        }
-        input.checked = userAnswers[index] === key;
-      });
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = Math.floor((now - startTime) / 1000);
+      const remaining = TIME_LIMIT - elapsed;
 
-      document.getElementById("progress").textContent = `Câu ${index + 1} / ${questions.length}`;
-    }
-
-    document.getElementById("next-btn").addEventListener("click", () => {
-      saveAnswer();
-      if (currentIndex < questions.length - 1) {
-        currentIndex++;
-        renderQuestion(currentIndex);
-      } else {
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        alert("⏱️ Hết thời gian! Bài kiểm tra sẽ được nộp.");
         showResult();
+        return;
       }
+
+      const minutes = Math.floor(remaining / 60);
+      const seconds = remaining % 60;
+      document.getElementById("timer").textContent =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+  }
+
+  function renderQuestion(index) {
+    const q = questions[index];
+    document.getElementById("question-number").textContent = index + 1;
+    document.getElementById("question-content").textContent = q.question;
+
+    ["option_1", "option_2", "option_3", "option_4"].forEach((key, i) => {
+      const input = document.getElementById("option" + String.fromCharCode(65 + i));
+      const label = document.getElementById("label" + String.fromCharCode(65 + i));
+      if (q[key]) {
+        input.style.display = "inline-block";
+        label.style.display = "inline-block";
+        label.textContent = String.fromCharCode(65 + i) + ". " + q[key];
+        input.value = key;
+      } else {
+        input.style.display = "none";
+        label.style.display = "none";
+      }
+      input.checked = userAnswers[index] === key;
     });
 
-    document.getElementById("prev-btn").addEventListener("click", () => {
-      saveAnswer();
-      if (currentIndex > 0) {
-        currentIndex--;
-        renderQuestion(currentIndex);
-      }
-    });
+    document.getElementById("progress").textContent = `Câu ${index + 1} / ${questions.length}`;
+  }
 
-    function saveAnswer() {
-      const checked = document.querySelector('input[name="answer"]:checked');
-      if (checked) {
-        userAnswers[currentIndex] = checked.value;
-      }
+  function saveAnswer() {
+    const checked = document.querySelector('input[name="answer"]:checked');
+    if (checked) {
+      userAnswers[currentIndex] = checked.value;
     }
+  }
 
-    async function showResult() {
-      clearInterval(timerInterval); // Dừng timer
+  async function showResult() {
+    clearInterval(timerInterval);
 
-      // Tính điểm
-      let score = 0;
-      questions.forEach((q, i) => {
-        if (userAnswers[i] === q.correct) score++;
-      });
+    let score = 0;
+    questions.forEach((q, i) => {
+      if (userAnswers[i] === q.correct) score++;
+    });
 
-      const subject = new URLSearchParams(window.location.search).get("topic");
-      const duration = Math.floor((Date.now() - startTime) / 1000);
+    const subject = new URLSearchParams(window.location.search).get("topic");
+    const duration = Math.floor((Date.now() - startTime) / 1000);
 
-      document.getElementById("question-area").style.display = "none";
-      document.getElementById("result-area").style.display = "block";
-      document.getElementById("score").textContent = score;
-      document.getElementById("total").textContent = questions.length;
+    document.getElementById("question-area").style.display = "none";
+    document.getElementById("result-area").style.display = "block";
+    document.getElementById("score").textContent = score;
+    document.getElementById("total").textContent = questions.length;
 
-      const resultDetail = document.getElementById("result-detail");
-      resultDetail.innerHTML = ""; // Xoá cũ
+    const resultDetail = document.getElementById("result-detail");
+    resultDetail.innerHTML = "";
 
-      // Xem lại đáp án
-      questions.forEach((q, i) => {
-        const userAnswer = userAnswers[i];
-        const isCorrect = userAnswer === q.correct;
-        const correctText = q[q.correct];
-        const selectedText = q[userAnswer] || "Không chọn";
+    questions.forEach((q, i) => {
+      const userAnswer = userAnswers[i];
+      const isCorrect = userAnswer === q.correct;
+      const correctText = q[q.correct];
+      const selectedText = q[userAnswer] || "Không chọn";
 
-        const questionHtml = `
-          <div class="mb-3 p-3 border rounded ${isCorrect ? 'border-success bg-light' : 'border-danger bg-light'}">
-            <p><strong>Câu ${i + 1}:</strong> ${q.question}</p>
-            ${
-              isCorrect
+      const questionHtml = `
+        <div class="mb-3 p-3 border rounded ${isCorrect ? 'border-success bg-light' : 'border-danger bg-light'}">
+          <p><strong>Câu ${i + 1}:</strong> ${q.question}</p>
+          ${
+            isCorrect
               ? `<p class="text-success">✅ Đúng! Đáp án: <strong>${correctText}</strong></p>`
               : `<p class="text-danger">❌ Sai! Bạn chọn: <strong>${selectedText}</strong></p>
-                <p class="text-success">✅ Đáp án đúng: <strong>${correctText}</strong></p>`
-            }
-          </div>
-        `;
+                 <p class="text-success">✅ Đáp án đúng: <strong>${correctText}</strong></p>`
+          }
+        </div>
+      `;
+      resultDetail.innerHTML += questionHtml;
+    });
 
-        resultDetail.innerHTML += questionHtml;
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    document.getElementById("duration").textContent =
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    try {
+      await fetch("/submit-result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: subject,
+          correct: score,
+          total: questions.length,
+          duration_seconds: duration
+        })
       });
+    } catch (err) {
+      console.error("Lỗi khi gửi kết quả:", err);
+    }
+  }
 
+  document.getElementById("next-btn").addEventListener("click", () => {
+    saveAnswer();
 
-      // Hiển thị thời gian làm bài
-      const minutes = Math.floor(duration / 60);
-      const seconds = duration % 60;
-      document.getElementById("duration").textContent =
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // Phát âm thanh đúng/sai nếu bật
+    if (soundEffectsEnabled) {
+      const selected = userAnswers[currentIndex];
+      const correct = questions[currentIndex].correct;
 
-      try {
-        await fetch("/submit-result", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            subject: subject,
-            correct: score,
-            total: questions.length,
-            duration_seconds: duration
-          })
-        });
-      } catch (err) {
-        console.error("Lỗi khi gửi kết quả:", err);
+      if (selected) {
+        if (selected === correct) {
+          correctSound.currentTime = 0;
+          correctSound.play();
+        } else {
+          wrongSound.currentTime = 0;
+          wrongSound.play();
+        }
       }
     }
 
-    const startTime = Date.now();
 
-    window.onload = () => {
-      console.log("🚀 Trang đã load, bắt đầu quiz!");
-      console.log(questions);
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
       renderQuestion(currentIndex);
-      startTimer();
-    };
+    } else {
+      showResult();
+    }
+  });
 
-  </script>
+  document.getElementById("prev-btn").addEventListener("click", () => {
+    saveAnswer();
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderQuestion(currentIndex);
+    }
+  });
+
+  window.onload = () => {
+    renderQuestion(currentIndex);
+    startTimer();
+  };
+</script>
 
   <%- include('partials/footer') %>

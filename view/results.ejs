@@ -4,32 +4,43 @@
   <h2 class="text-center mb-4">📊 Kết quả làm bài của bạn</h2>
 
   <% if (results.length === 0) { %>
-    <p class="text-center">Bạn chưa làm bài nào.</p>
+    <p class="text-center text-muted">Bạn chưa làm bài nào.</p>
   <% } else { %>
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
-        <tr>
-          <th>#</th>
-          <th>Môn</th>
-          <th>Số câu đúng</th>
-          <th>Tổng</th>
-          <th>Thời gian làm (giây)</th>
-          <th>Ngày nộp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% results.forEach((r, index) => { %>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle text-center">
+        <thead class="table-dark">
           <tr>
-            <td><%= index + 1 %></td>
-            <td><%= r.subject %></td>
-            <td><%= r.correct %></td>
-            <td><%= r.total %></td>
-            <td><%= r.duration_seconds %></td>
-            <td><%= new Date(r.submitted_at).toLocaleString("vi-VN") %></td>
+            <th>#</th>
+            <th>Môn</th>
+            <th>✅ Đúng</th>
+            <th>📋 Tổng</th>
+            <th>⏱️ Thời gian</th>
+            <th>📅 Ngày nộp</th>
+            <th>🎯 Tỷ lệ</th>
           </tr>
-        <% }); %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% results.forEach((r, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= r.subject %></td>
+              <td class="<%= r.correct / r.total >= 0.7 ? 'text-success' : 'text-danger' %>">
+                <%= r.correct %>
+              </td>
+              <td><%= r.total %></td>
+              <td>
+                <%= Math.floor(r.duration_seconds / 60) %> phút
+                <%= r.duration_seconds % 60 %> giây
+              </td>
+              <td><%= new Date(r.submitted_at).toLocaleString("vi-VN") %></td>
+              <td>
+                <%= ((r.correct / r.total) * 100).toFixed(0) %>%
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
   <% } %>
 </main>
 
